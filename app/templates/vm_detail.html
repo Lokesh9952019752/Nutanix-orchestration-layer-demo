@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}{{ vm.name }} · Prism Central Demo{% endblock %}
+{% block content %}
+<a href="/">← Dashboard</a>
+<section class="card">
+  <h1>{{ vm.name }}</h1>
+  <dl class="detail-list">
+    <dt>Environment</dt><dd>{{ vm.environment }}</dd>
+    <dt>UUID</dt><dd>{{ vm.uuid }}</dd>
+    <dt>Power state</dt><dd>{{ vm.power_state }}</dd>
+    <dt>Cluster</dt><dd>{{ vm.cluster_name or '—' }}</dd>
+    <dt>CPU</dt><dd>{{ vm.num_vcpus or '—' }} sockets × {{ vm.num_cores_per_vcpu or '—' }} cores</dd>
+    <dt>Memory</dt><dd>{{ vm.memory_mib or '—' }} MiB</dd>
+    <dt>IP addresses</dt><dd>{{ vm.ip_addresses | join(', ') if vm.ip_addresses else '—' }}</dd>
+  </dl>
+  <p><a class="button" href="/environments/{{ vm.environment }}/vms/{{ vm.uuid }}/console">Open console</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Console · Prism Central Demo{% endblock %}
+{% block content %}
+<a href="/">← Dashboard</a>
+<section class="card">
+  <h1>VM console</h1>
+  <p>If your Prism Central portal blocks embedding, open the console in a new tab.</p>
+  <p><a class="button" href="{{ console.url }}" target="_blank" rel="noreferrer">Open console externally</a></p>
+  <iframe class="console-frame" src="{{ console.url }}" title="Console for {{ console.vm_uuid }}"></iframe>
+</section>
+{% endblock %}
