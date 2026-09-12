@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Prism FastAPI Demo{% endblock %}
+{% block content %}
+<h1>VM Dashboard</h1>
+<p class="muted">Inventory refreshes periodically while this page is open.</p>
+<div id="status-strip" class="status-strip" data-status-url="/status">Checking environment status…</div>
+<div class="grid">
+{% for panel in panels %}
+  <section class="panel" data-environment="{{ panel.environment.key }}">
+    <header>
+      <h2>{{ panel.environment.label }}</h2>
+      <p><code>{{ panel.environment.base_url }}</code></p>
+    </header>
+    {% if panel.error %}
+      <div class="alert error">
+        <strong>Connection error:</strong> {{ panel.error.message }}
+        {% if panel.error.status_code %}<span>({{ panel.error.status_code }})</span>{% endif %}
+      </div>
+    {% endif %}
+
+    <h3>Create VM</h3>
+    <form method="post" action="/environments/{{ panel.environment.key }}/vms" class="vm-form">
+      <label>Name <input name="name" required></label>
+      <label>CPUs <input name="cpu_count" type="number" min="1" value="2" required></label>
+      <label>Cores/socket <input name="cores_per_socket" type="number" min="1" value="1" required></label>
+      <label>Memory GiB <input name="memory_gib" type="number" min="1" step="0.5" value="4" required></label>
+      <label>Disk GiB <input name="disk_gib" type="number" min="1" step="1" value="20" required></label>
+      <label>Image UUID <input name="image_uuid" required></label>
+      <label>Subnet UUID <input name="subnet_uuid" required></label>
+      <label>Cluster UUID <input name="cluster_uuid" required></label>
+      <label>Address mode
+        <select name="address_mode">
+          <option value="dhcp">DHCP</option>
+          <option value="static">Static</option>
+        </select>
+      </label>
+      <label>Static IP <input name="static_ip" placeholder="Optional unless static"></label>
+      <label class="wide">Description <input name="description"></label>
+      <button type="submit">Create VM</button>
+    </form>
+
+    <h3>Inventory</h3>
+    {% if panel.vms %}
+      <table>
+        <thead><tr><th>Name</th><th>Power</th><th>CPU</th><th>Memory</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for vm in panel.vms %}
+          <tr>
+            <td><a href="/environments/{{ panel.environment.key }}/vms/{{ vm.uuid }}">{{ vm.name }}</a></td>
+            <td>{{ vm.power_state }}</td>
+            <td>{{ vm.cpu_count or '—' }}</td>
+            <td>{% if vm.memory_mib %}{{ (vm.memory_mib / 1024) | round(1) }} GiB{% else %}—{% endif %}</td>
+            <td><a href="/environments/{{ panel.environment.key }}/vms/{{ vm.uuid }}/console">Console</a></td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p class="muted">No VMs loaded for this environment.</p>
+    {% endif %}
+  </section>
+{% endfor %}
+</div>
+{% endblock %}

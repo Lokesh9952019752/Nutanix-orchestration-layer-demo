@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}VM Detail · Prism FastAPI Demo{% endblock %}
+{% block content %}
+<a href="/">← Dashboard</a>
+<h1>{{ environment.label }} VM Detail</h1>
+{% if error %}
+  <div class="alert error">{{ error.message }}</div>
+{% elif vm %}
+  <section class="panel">
+    <h2>{{ vm.name }}</h2>
+    <dl class="details">
+      <dt>UUID</dt><dd>{{ vm.uuid }}</dd>
+      <dt>Power state</dt><dd>{{ vm.power_state }}</dd>
+      <dt>CPUs</dt><dd>{{ vm.cpu_count or '—' }}</dd>
+      <dt>Cores/socket</dt><dd>{{ vm.cores_per_socket or '—' }}</dd>
+      <dt>Memory</dt><dd>{% if vm.memory_mib %}{{ (vm.memory_mib / 1024) | round(1) }} GiB{% else %}—{% endif %}</dd>
+      <dt>Cluster UUID</dt><dd>{{ vm.cluster_uuid or '—' }}</dd>
+      <dt>Description</dt><dd>{{ vm.description or '—' }}</dd>
+    </dl>
+    <p><a class="button" href="/environments/{{ environment.key }}/vms/{{ vm.uuid }}/console">Open console</a></p>
+    <h3>NICs</h3>
+    <ul>{% for nic in vm.nics %}<li>{{ nic.address_mode or 'network' }} — {{ nic.ip_address or 'no IP' }} — {{ nic.subnet_uuid or 'no subnet' }}</li>{% else %}<li>No NICs reported.</li>{% endfor %}</ul>
+    <h3>Disks</h3>
+    <ul>{% for disk in vm.disks %}<li>{{ disk.size_gib or 'unknown' }} GiB {{ disk.device_type or '' }}</li>{% else %}<li>No disks reported.</li>{% endfor %}</ul>
+  </section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}VM Console · Prism FastAPI Demo{% endblock %}
+{% block content %}
+<a href="/">← Dashboard</a>
+<h1>{{ environment.label }} Console</h1>
+{% if error %}
+  <div class="alert error">{{ error.message }}</div>
+{% elif console %}
+  <p>If the embedded console is blocked by Prism browser policy, use the external launch link.</p>
+  <p><a class="button" href="{{ console.url }}" target="_blank" rel="noopener">Launch console in a new tab</a></p>
+  <iframe class="console-frame" src="{{ console.url }}" title="Prism VM console for {{ console.vm_uuid }}"></iframe>
+{% endif %}
+{% endblock %}
