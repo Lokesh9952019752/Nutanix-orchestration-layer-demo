@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Prism FastAPI Demo{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="/">Prism FastAPI Demo</a>
+    {% if user is defined or request.url.path != '/login' %}
+    <form method="post" action="/logout"><button type="submit">Logout</button></form>
+    {% endif %}
+  </header>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+  <script src="{{ url_for('static', path='/app.js') }}"></script>
+</body>
+</html>
