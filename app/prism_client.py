@@ -68,9 +68,21 @@ class PrismClient(AbstractAsyncContextManager):
             raise PrismClientError(f"Prism {environment} returned non-JSON data") from exc
 
     async def list_vms(self, environment: str) -> list[VMSummary]:
-        body = {"kind": "vm", "length": 100, "offset": 0}
-        data = await self._request(environment, "POST", "/api/nutanix/v3/vms/list", json=body)
-        entities = data.get("entities", [])
+        length = 100
+        offset = 0
+        entities = []
+        while True:
+            body = {"kind": "vm", "length": length, "offset": offset}
+            data = await self._request(environment, "POST", "/api/nutanix/v3/vms/list", json=body)
+            page_entities = data.get("entities", [])
+            entities.extend(page_entities)
+            metadata = data.get("metadata", {})
+            total = metadata.get("total_matches") or metadata.get("total")
+            if total is not None:
+                total = int(total)
+            if not page_entities or len(page_entities) < length or (total is not None and len(entities) >= total):
+                break
+            offset += len(page_entities)
         return [self._summary_from_entity(environment, entity) for entity in entities]
 
     async def get_vm(self, environment: str, vm_uuid: str) -> VMDetail:

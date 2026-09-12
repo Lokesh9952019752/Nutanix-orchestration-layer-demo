@@ -14,6 +14,7 @@ def build_client() -> TestClient:
         APP_ADMIN_USERNAME="boss",
         APP_ADMIN_PASSWORD="secret",
         SESSION_SECRET="test-secret",
+        SESSION_COOKIE_SECURE=False,
     )
     return TestClient(create_app(settings=settings, prism_client_factory=lambda settings: EmptyPrismClient()))
 
@@ -25,6 +26,20 @@ def test_valid_login_creates_session_and_reaches_dashboard():
 
     assert response.status_code == 200
     assert "Prism Central dashboard" in response.text
+
+
+def test_session_cookie_is_secure_by_default():
+    settings = Settings(
+        APP_ADMIN_USERNAME="boss",
+        APP_ADMIN_PASSWORD="secret",
+        SESSION_SECRET="test-secret",
+    )
+    client = TestClient(create_app(settings=settings, prism_client_factory=lambda settings: EmptyPrismClient()))
+
+    response = client.post("/login", data={"username": "boss", "password": "secret"}, follow_redirects=False)
+
+    assert response.status_code == 303
+    assert "secure" in response.headers["set-cookie"].lower()
 
 
 def test_invalid_login_shows_error_without_session():

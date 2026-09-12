@@ -12,6 +12,7 @@ uvicorn app.main:app --reload
 ```
 
 The local demo defaults are `admin` / `admin`. Use real values for `APP_ADMIN_USERNAME`, `APP_ADMIN_PASSWORD`, and `SESSION_SECRET` outside disposable demos.
+Set `SESSION_COOKIE_SECURE=false` only for local HTTP testing.
 
 ## Environment variables
 
@@ -20,6 +21,7 @@ All credentials and Prism Central portal settings are loaded from environment va
 - `APP_ADMIN_USERNAME`
 - `APP_ADMIN_PASSWORD`
 - `SESSION_SECRET`
+- `SESSION_COOKIE_SECURE` (`true` by default; set `false` only for local HTTP testing)
 - `PRISM_VERIFY_SSL` (`true` by default; set `false` only for lab portals with private certificates when acceptable)
 - `PRISM_ONPREM_URL`
 - `PRISM_ONPREM_USERNAME`

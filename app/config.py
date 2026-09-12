@@ -18,11 +18,12 @@ class PrismEnvironmentConfig(BaseSettings):
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
-    model_config = SettingsConfigDict(extra="ignore")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 
     app_admin_username: str = Field(default="admin", alias="APP_ADMIN_USERNAME")
     app_admin_password: str = Field(default="admin", alias="APP_ADMIN_PASSWORD")
     session_secret: str = Field(default="local-demo-only-change-me", alias="SESSION_SECRET")
+    session_cookie_secure: bool = Field(default=True, alias="SESSION_COOKIE_SECURE")
     prism_verify_ssl: bool = Field(default=True, alias="PRISM_VERIFY_SSL")
 
     prism_onprem_url: AnyHttpUrl = Field(

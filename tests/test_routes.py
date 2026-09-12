@@ -40,6 +40,7 @@ def make_client(fake=None):
         APP_ADMIN_USERNAME="admin",
         APP_ADMIN_PASSWORD="password",
         SESSION_SECRET="test-secret",
+        SESSION_COOKIE_SECURE=False,
     )
     return TestClient(create_app(settings=settings, prism_client_factory=lambda settings: fake)), fake
 
@@ -94,6 +95,27 @@ def test_vm_creation_calls_selected_environment():
     assert response.json() == {"uuid": "task-123", "status": "PENDING", "message": None}
     assert fake.created[0][0] == "nc2_aws"
     assert fake.created[0][1].name == "created-vm"
+
+
+def test_invalid_vm_creation_form_returns_validation_error():
+    client, fake = make_client()
+    login(client)
+
+    response = client.post(
+        "/environments/nc2_aws/vms",
+        data={
+            "name": "created-vm",
+            "cluster_uuid": "cluster-1",
+            "network_uuid": "subnet-1",
+            "vcpus": 0,
+            "cores_per_vcpu": 1,
+            "memory_mib": 4096,
+            "disk_size_mib": 51200,
+        },
+    )
+
+    assert response.status_code == 422
+    assert fake.created == []
 
 
 def test_failed_environment_does_not_hide_other_environment():

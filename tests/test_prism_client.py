@@ -63,6 +63,36 @@ def test_list_vms_uses_environment_endpoint_auth_and_normalizes_response():
     assert vms[0].ip_addresses == ["10.1.2.3"]
 
 
+def test_list_vms_fetches_all_pages():
+    offsets = []
+
+    def entity(uuid: str) -> dict:
+        return {
+            "metadata": {"uuid": uuid},
+            "spec": {"name": uuid},
+            "status": {"resources": {"power_state": "ON"}},
+        }
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        offsets.append(payload["offset"])
+        if payload["offset"] == 0:
+            return json_response(
+                {
+                    "metadata": {"total_matches": 101},
+                    "entities": [entity(f"vm-{index}") for index in range(100)],
+                }
+            )
+        return json_response({"metadata": {"total_matches": 101}, "entities": [entity("vm-100")]})
+
+    client = PrismClient(settings(), transport=httpx.MockTransport(handler))
+    vms = run(client.list_vms("on_prem"))
+
+    assert offsets == [0, 100]
+    assert len(vms) == 101
+    assert vms[-1].uuid == "vm-100"
+
+
 def test_create_vm_maps_payload_to_prism_v3_shape_and_selected_environment():
     captured = {}
 

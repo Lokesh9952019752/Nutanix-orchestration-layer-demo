@@ -5,6 +5,7 @@ from fastapi import Depends, FastAPI, Form, HTTPException, Request, status
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from pydantic import ValidationError
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.auth import current_user, login_user, logout_user, redirect_if_anonymous, require_user, verify_credentials
@@ -36,7 +37,12 @@ def create_app(settings: Settings | None = None, prism_client_factory: PrismFact
     prism_client_factory = prism_client_factory or default_prism_client_factory
 
     app = FastAPI(title="Prism Central Management Demo")
-    app.add_middleware(SessionMiddleware, secret_key=settings.session_secret, same_site="lax", https_only=False)
+    app.add_middleware(
+        SessionMiddleware,
+        secret_key=settings.session_secret,
+        same_site="lax",
+        https_only=settings.session_cookie_secure,
+    )
     app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
     app.state.settings = settings
@@ -124,17 +130,20 @@ def create_app(settings: Settings | None = None, prism_client_factory: PrismFact
         disk_size_mib: int = Form(51200),
     ) -> RedirectResponse:
         require_user(request)
-        vm_request = VMCreateRequest(
-            name=name,
-            description=description,
-            cluster_uuid=cluster_uuid,
-            network_uuid=network_uuid,
-            image_uuid=image_uuid or None,
-            vcpus=vcpus,
-            cores_per_vcpu=cores_per_vcpu,
-            memory_mib=memory_mib,
-            disk_size_mib=disk_size_mib,
-        )
+        try:
+            vm_request = VMCreateRequest(
+                name=name,
+                description=description,
+                cluster_uuid=cluster_uuid,
+                network_uuid=network_uuid,
+                image_uuid=image_uuid or None,
+                vcpus=vcpus,
+                cores_per_vcpu=cores_per_vcpu,
+                memory_mib=memory_mib,
+                disk_size_mib=disk_size_mib,
+            )
+        except ValidationError as exc:
+            raise HTTPException(status_code=422, detail=exc.errors()) from exc
         await _call_client(settings, prism_client_factory, "create_vm", environment, vm_request)
         return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
 
