@@ -1,0 +1,26 @@
+:root { color-scheme: light; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+body { margin: 0; background: #f5f7fb; color: #172033; }
+a { color: #155eef; }
+.topbar { align-items: center; background: #0b1220; color: white; display: flex; justify-content: space-between; padding: 1rem 2rem; }
+.topbar a { color: white; text-decoration: none; }
+.topbar form { align-items: center; display: flex; gap: 1rem; margin: 0; }
+.brand { font-weight: 700; }
+.container { margin: 0 auto; max-width: 1180px; padding: 2rem; }
+.lede { color: #526070; }
+.card { background: white; border: 1px solid #d8deea; border-radius: 16px; box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08); margin-bottom: 1.5rem; padding: 1.5rem; }
+.login-card { max-width: 420px; }
+.environment-grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); }
+table { border-collapse: collapse; margin: 1rem 0; width: 100%; }
+th, td { border-bottom: 1px solid #e6eaf2; padding: .75rem; text-align: left; vertical-align: top; }
+.stack, .grid-form { display: grid; gap: 1rem; }
+.grid-form { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 1rem; }
+label { display: grid; gap: .35rem; font-weight: 600; }
+input { border: 1px solid #c6cedb; border-radius: 8px; font: inherit; padding: .55rem .65rem; }
+button, .button { background: #155eef; border: 0; border-radius: 8px; color: white; cursor: pointer; display: inline-block; font: inherit; font-weight: 700; padding: .6rem .9rem; text-decoration: none; }
+button:disabled { cursor: wait; opacity: .7; }
+.alert { border-radius: 8px; margin: 1rem 0; padding: .8rem; }
+.error { background: #fff1f0; border: 1px solid #ffccc7; color: #a8071a; }
+.pill { background: #edf3ff; border-radius: 999px; color: #1d4ed8; padding: .25rem .5rem; }
+.detail-list { display: grid; grid-template-columns: max-content 1fr; gap: .75rem 1rem; }
+.detail-list dt { color: #526070; font-weight: 700; }
+.console-frame { border: 1px solid #d8deea; border-radius: 12px; height: 640px; width: 100%; }

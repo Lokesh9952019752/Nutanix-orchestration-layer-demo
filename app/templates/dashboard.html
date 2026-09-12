@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · Prism Central Demo{% endblock %}
+{% block content %}
+<h1>Prism Central dashboard</h1>
+<p class="lede">Manage on-prem and NC2 AWS Prism Central VM inventory from one signed-session dashboard.</p>
+<div class="environment-grid">
+{% for panel in environments %}
+  <section class="card environment" data-environment="{{ panel.info.key }}">
+    <header>
+      <h2>{{ panel.info.label }}</h2>
+      <p>{{ panel.info.base_url }}</p>
+    </header>
+
+    {% if panel.error %}
+      <div class="alert error">Could not load {{ panel.info.label }}: {{ panel.error }}</div>
+    {% else %}
+      <table>
+        <thead><tr><th>Name</th><th>Power</th><th>IP addresses</th><th>Actions</th></tr></thead>
+        <tbody>
+        {% for vm in panel.vms %}
+          <tr>
+            <td>{{ vm.name }}</td>
+            <td><span class="pill">{{ vm.power_state }}</span></td>
+            <td>{{ vm.ip_addresses | join(', ') if vm.ip_addresses else '—' }}</td>
+            <td>
+              <a href="/environments/{{ panel.info.key }}/vms/{{ vm.uuid }}">Details</a>
+              <a href="/environments/{{ panel.info.key }}/vms/{{ vm.uuid }}/console">Console</a>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="4">No VMs returned.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <details class="create-panel">
+      <summary>Create VM in {{ panel.info.label }}</summary>
+      <form method="post" action="/environments/{{ panel.info.key }}/vms" class="grid-form">
+        <label>Name <input name="name" required></label>
+        <label>Description <input name="description" value="Created by Prism FastAPI demo"></label>
+        <label>Cluster UUID <input name="cluster_uuid" required></label>
+        <label>Image UUID <input name="image_uuid"></label>
+        <label>Network/Subnet UUID <input name="network_uuid" required></label>
+        <label>vCPUs <input name="vcpus" type="number" min="1" value="2"></label>
+        <label>Cores per vCPU <input name="cores_per_vcpu" type="number" min="1" value="1"></label>
+        <label>Memory MiB <input name="memory_mib" type="number" min="1" value="4096"></label>
+        <label>Disk MiB <input name="disk_size_mib" type="number" min="1" value="51200"></label>
+        <button type="submit">Create VM</button>
+      </form>
+    </details>
+  </section>
+{% endfor %}
+</div>
+{% endblock %}
